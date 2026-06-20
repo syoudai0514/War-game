@@ -1,0 +1,13 @@
+{
+  "appId": "com.mergewar.app",
+  "appName": "マージ大戦",
+  "webDir": "www",
+  "backgroundColor": "#0b1220",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1000,
+      "backgroundColor": "#0b1220",
+      "showSpinner": false
+    }
+  }
+}

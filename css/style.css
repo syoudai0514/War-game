@@ -1,0 +1,150 @@
+/* ============================================================
+   style.css — モバイル縦持ち前提。中央に最大 480px の縦長カラム。
+   ============================================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body {
+  height: 100%;
+  background: #05080f;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: #e5e7eb;
+  overflow: hidden;
+  user-select: none; -webkit-user-select: none;
+  overscroll-behavior: none;
+}
+
+#game-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  height: 100%;
+  margin: 0 auto;
+  background: #0b1220;
+  overflow: hidden;
+}
+
+#view {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+}
+
+/* ── 上部 HUD ── */
+#hud-top {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px 0;
+  z-index: 5;
+  pointer-events: none;
+}
+.stat {
+  display: flex; align-items: center; gap: 3px;
+  font-weight: 700; font-size: 14px;
+  background: rgba(0,0,0,0.3);
+  padding: 4px 8px; border-radius: 10px;
+  white-space: nowrap;
+}
+.stat .ic { font-size: 14px; }
+#hp-bar {
+  position: relative;
+  flex: 1;
+  height: 20px;
+  background: rgba(0,0,0,0.45);
+  border-radius: 10px;
+  overflow: hidden;
+  min-width: 60px;
+}
+#hp-fill {
+  position: absolute; inset: 0;
+  width: 100%;
+  background: #22c55e;
+  transition: width 0.2s ease, background 0.2s;
+}
+#hp-text {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+
+/* ── 下部コントロール ── */
+#controls {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 92px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+  z-index: 5;
+}
+#produce {
+  flex: 1;
+  height: 64px;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #f59e0b, #d97706);
+  color: #1a1208;
+  font-weight: 800;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px;
+  box-shadow: 0 4px 0 #92400e, 0 6px 12px rgba(0,0,0,0.4);
+  cursor: pointer;
+  transition: transform 0.05s;
+}
+#produce .big { font-size: 20px; }
+#produce .sub { font-size: 14px; }
+#produce:active { transform: translateY(3px); box-shadow: 0 1px 0 #92400e; }
+#produce.disabled { filter: grayscale(0.7) brightness(0.7); }
+
+#mute {
+  width: 56px; height: 56px;
+  border: none; border-radius: 14px;
+  background: rgba(255,255,255,0.08);
+  font-size: 22px; cursor: pointer;
+}
+#restart {
+  display: none;
+  height: 64px; padding: 0 18px;
+  border: none; border-radius: 16px;
+  background: linear-gradient(180deg, #3b82f6, #2563eb);
+  color: #fff; font-weight: 800; font-size: 16px;
+  box-shadow: 0 4px 0 #1d4ed8;
+  cursor: pointer;
+}
+#restart:active { transform: translateY(3px); box-shadow: 0 1px 0 #1d4ed8; }
+
+/* ── スタートゲート ── */
+#start-gate {
+  position: absolute; inset: 0;
+  z-index: 20;
+  background: radial-gradient(circle at 50% 30%, #1a2742, #060a14);
+  display: flex; align-items: center; justify-content: center;
+  text-align: center;
+  transition: opacity 0.4s;
+}
+#start-gate.hidden { opacity: 0; pointer-events: none; }
+.gate-inner { padding: 24px; max-width: 360px; }
+.gate-inner h1 { font-size: 40px; margin-bottom: 4px; }
+.tagline { color: #fbbf24; font-weight: 700; letter-spacing: 3px; margin-bottom: 24px; }
+.how {
+  text-align: left;
+  background: rgba(255,255,255,0.05);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-bottom: 24px;
+  line-height: 2;
+  font-size: 15px;
+}
+.how b { color: #fbbf24; }
+.start-hint {
+  font-size: 18px; font-weight: 700;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
