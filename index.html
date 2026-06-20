@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>マージ大戦 - MERGE WAR</title>
+  <meta name="description" content="同じユニットを合体させて最強の軍隊を育て、押し寄せる敵を迎え撃つ!サクサク遊べるマージ×タワーディフェンス。">
+  <meta name="theme-color" content="#0b1220">
+
+  <!-- OGP -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="マージ大戦 - MERGE WAR">
+  <meta property="og:description" content="合体でユニットを進化させ、ウェーブを生き延びろ!">
+  <meta property="og:url" content="https://syoudai0514.github.io/War-game/">
+
+  <link rel="stylesheet" href="css/style.css?v=1">
+</head>
+<body>
+  <div id="game-wrap">
+    <canvas id="view"></canvas>
+
+    <!-- 上部 HUD -->
+    <div id="hud-top">
+      <div class="stat"><span class="ic">🪙</span><span id="gold">0</span></div>
+      <div class="stat"><span class="ic">🌊</span>WAVE <span id="wave">1</span></div>
+      <div class="stat"><span class="ic">🏆</span><span id="best">0</span></div>
+      <div id="hp-bar">
+        <div id="hp-fill"></div>
+        <span id="hp-text">100/100</span>
+      </div>
+    </div>
+
+    <!-- 下部コントロール -->
+    <div id="controls">
+      <button id="produce">
+        <span class="big">⚔️ 生産</span>
+        <span class="sub">🪙 <span id="produce-cost">8</span></span>
+      </button>
+      <button id="restart">🔄 もう一度</button>
+      <button id="mute">🔊</button>
+    </div>
+
+    <!-- スタートゲート -->
+    <div id="start-gate">
+      <div class="gate-inner">
+        <h1>⚔️ マージ大戦</h1>
+        <p class="tagline">MERGE WAR</p>
+        <div class="how">
+          <p>① <b>⚔️生産</b>でユニットを出す</p>
+          <p>② 同じユニットを<b>ドラッグで合体</b>→進化!</p>
+          <p>③ 強い軍隊で敵を<b>迎え撃て</b></p>
+          <p>④ ベースを守ってウェーブを生き延びろ</p>
+        </div>
+        <p class="start-hint">タップで開始</p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js?v=1"></script>
+</body>
+</html>

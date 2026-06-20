@@ -1,0 +1,23 @@
+{
+  "name": "merge-war",
+  "version": "1.0.0",
+  "private": true,
+  "description": "マージ大戦 - 合体でユニットを進化させて敵を迎え撃つマージ×タワーディフェンス",
+  "type": "module",
+  "scripts": {
+    "build:web": "node scripts/build-web.mjs",
+    "sync": "npm run build:web && cap sync android",
+    "open:android": "cap open android",
+    "assets": "capacitor-assets generate --android"
+  },
+  "dependencies": {
+    "@capacitor-community/admob": "^8.0.0",
+    "@capacitor/android": "^8.4.0",
+    "@capacitor/core": "^8.4.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.4.0",
+    "esbuild": "^0.25.0"
+  }
+}
