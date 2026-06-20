@@ -37,20 +37,26 @@ window.addEventListener('resize', resize);
 // ── ポインタ座標をキャンバスのローカル座標へ変換 ──
 function pos(e) {
   const r = canvas.getBoundingClientRect();
-  const t = e.touches ? e.touches[0] : e;
-  return { x: t.clientX - r.left, y: t.clientY - r.top };
+  return { x: e.clientX - r.left, y: e.clientY - r.top };
 }
 
-function down(e) { e.preventDefault(); unlock(); const p = pos(e); game.pointerDown(p.x, p.y); }
-function move(e) { if (!game.drag) return; e.preventDefault(); const p = pos(e); game.pointerMove(p.x, p.y); }
-function up(e)   { e.preventDefault(); const p = pos(e.changedTouches ? { touches: e.changedTouches } : e); game.pointerUp(p.x, p.y); }
-
-canvas.addEventListener('mousedown', down);
-canvas.addEventListener('mousemove', move);
-window.addEventListener('mouseup', up);
-canvas.addEventListener('touchstart', down, { passive: false });
-canvas.addEventListener('touchmove', move, { passive: false });
-window.addEventListener('touchend', up, { passive: false });
+// 入力は Pointer Events に統一(マウス/タッチ両対応)。
+// ※ touchend で preventDefault すると iOS では他要素の click(スタート画面・
+//   各ボタン)まで打ち消されてしまうため、グローバルな preventDefault はしない。
+//   キャンバスの touch-action: none(CSS)でスクロール等は抑止済み。
+canvas.addEventListener('pointerdown', (e) => {
+  unlock();
+  canvas.setPointerCapture?.(e.pointerId);   // 指がキャンバス外へ出ても追従
+  const p = pos(e); game.pointerDown(p.x, p.y);
+});
+canvas.addEventListener('pointermove', (e) => {
+  if (!game.drag) return;
+  const p = pos(e); game.pointerMove(p.x, p.y);
+});
+canvas.addEventListener('pointerup', (e) => {
+  const p = pos(e); game.pointerUp(p.x, p.y);
+});
+canvas.addEventListener('pointercancel', () => { game.drag = null; });
 
 // ── ボタン ──
 produceBtn.addEventListener('click', () => { unlock(); game.produce(); });
