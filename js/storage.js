@@ -1,14 +1,26 @@
 // ============================================================
-//  storage.js — localStorage にベスト記録などを保存する薄いラッパー
+//  storage.js — コイン・ベスト記録・永続強化を localStorage に保存
 // ============================================================
 
-const KEY = 'mergewar.save.v1';
+const KEY = 'mergewar.save.v2';
+
+const DEFAULT = {
+  coins: 0,
+  bestDistance: 0,
+  upgrades: { start: 0, power: 0, rate: 0, weapon: 0 },
+};
 
 export function load() {
   try {
-    return JSON.parse(localStorage.getItem(KEY)) || {};
+    const d = JSON.parse(localStorage.getItem(KEY));
+    if (!d) return { ...DEFAULT, upgrades: { ...DEFAULT.upgrades } };
+    return {
+      coins: d.coins || 0,
+      bestDistance: d.bestDistance || 0,
+      upgrades: { ...DEFAULT.upgrades, ...(d.upgrades || {}) },
+    };
   } catch {
-    return {};
+    return { ...DEFAULT, upgrades: { ...DEFAULT.upgrades } };
   }
 }
 
@@ -17,17 +29,5 @@ export function save(data) {
     localStorage.setItem(KEY, JSON.stringify(data));
   } catch {
     /* プライベートモード等で書けなくても無視 */
-  }
-}
-
-export function getBestWave() {
-  return load().bestWave || 0;
-}
-
-export function setBestWave(wave) {
-  const data = load();
-  if (wave > (data.bestWave || 0)) {
-    data.bestWave = wave;
-    save(data);
   }
 }
