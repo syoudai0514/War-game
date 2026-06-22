@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>マージ大戦 - MERGE WAR</title>
-  <meta name="description" content="同じユニットを合体させて最強の軍隊を育て、押し寄せる敵を迎え撃つ!サクサク遊べるマージ×タワーディフェンス。">
-  <meta name="theme-color" content="#0b1220">
+  <title>群衆大戦 - ARMY RUSH</title>
+  <meta name="description" content="兵士の大群を率い、+や×のゲートで仲間を増やして全員で撃ちまくる!サクサク中毒の群衆シューター。">
+  <meta name="theme-color" content="#0a1322">
 
   <!-- OGP -->
   <meta property="og:type" content="website">
-  <meta property="og:title" content="マージ大戦 - MERGE WAR">
-  <meta property="og:description" content="合体でユニットを進化させ、ウェーブを生き延びろ!">
+  <meta property="og:title" content="群衆大戦 - ARMY RUSH">
+  <meta property="og:description" content="ゲートで仲間を増やし、大群で撃ちまくれ!">
   <meta property="og:url" content="https://syoudai0514.github.io/War-game/">
 
-  <link rel="stylesheet" href="css/style.css?v=2">
+  <link rel="stylesheet" href="css/style.css?v=3">
 </head>
 <body>
   <div id="game-wrap">
@@ -21,41 +21,48 @@
 
     <!-- 上部 HUD -->
     <div id="hud-top">
-      <div class="stat"><span class="ic">🪙</span><span id="gold">0</span></div>
-      <div class="stat"><span class="ic">🌊</span>WAVE <span id="wave">1</span></div>
-      <div class="stat"><span class="ic">🏆</span><span id="best">0</span></div>
-      <div id="hp-bar">
-        <div id="hp-fill"></div>
-        <span id="hp-text">100/100</span>
-      </div>
+      <div class="stat"><span class="ic">📏</span><span id="dist">0</span>m</div>
+      <div class="stat"><span class="ic">🪙</span><span id="coins">0</span></div>
+      <div class="stat"><span class="ic" id="wpn-ic">🔫</span><span id="wpn-name">ピストル</span></div>
+      <button id="mute">🔊</button>
     </div>
 
-    <!-- 下部コントロール -->
-    <div id="controls">
-      <button id="produce">
-        <span class="big">⚔️ 生産</span>
-        <span class="sub">🪙 <span id="produce-cost">8</span></span>
-      </button>
-      <button id="restart">🔄 もう一度</button>
-      <button id="mute">🔊</button>
+    <!-- 操作ヒント -->
+    <div id="hint">⬅ ドラッグで部隊を動かす ➡</div>
+
+    <!-- ゲームオーバー / 強化ショップ -->
+    <div id="overlay" class="hidden">
+      <div class="panel">
+        <h2 id="ov-title">リザルト</h2>
+        <div class="result">
+          <div><span class="big" id="ov-dist">0</span><small>m 到達</small></div>
+          <div><span class="big" id="ov-best">0</span><small>m ベスト</small></div>
+        </div>
+        <div class="coins-row">🪙 <b id="ov-coins">0</b>　<small>(+<span id="ov-earned">0</span> 獲得)</small></div>
+
+        <div class="shop-title">⚡ 強化してもっと強く</div>
+        <div id="shop"></div>
+
+        <button id="restart">▶ もう一度プレイ</button>
+      </div>
     </div>
 
     <!-- スタートゲート -->
     <div id="start-gate">
       <div class="gate-inner">
-        <h1>⚔️ マージ大戦</h1>
-        <p class="tagline">MERGE WAR</p>
+        <h1>🎯 群衆大戦</h1>
+        <p class="tagline">ARMY RUSH</p>
         <div class="how">
-          <p>① <b>⚔️生産</b>でユニットを出す</p>
-          <p>② 同じユニットを<b>ドラッグで合体</b>→進化!</p>
-          <p>③ 強い軍隊で敵を<b>迎え撃て</b></p>
-          <p>④ ベースを守ってウェーブを生き延びろ</p>
+          <p>① 指で<b>部隊を左右に動かす</b></p>
+          <p>② <b>+ や ×</b> のゲートで<b>仲間を増やす</b></p>
+          <p>③ 全員で<b>銃を撃って</b>敵バリアを破壊</p>
+          <p>④ <b>武器UP</b>で火力を強化!ボスを倒せ</p>
         </div>
         <p class="start-hint">タップで開始</p>
       </div>
     </div>
   </div>
 
-  <script type="module" src="js/main.js?v=2"></script>
+  <script type="module" src="js/main.js?v=3"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 // ============================================================
-//  main.js — 起動・ゲームループ・入力・HUD 連携
+//  main.js — 起動・ゲームループ・操作・HUD・強化ショップ連携
 // ============================================================
 
 import { Game } from './game.js';
@@ -11,19 +11,9 @@ const canvas = document.getElementById('view');
 const ctx = canvas.getContext('2d');
 const game = new Game();
 
-// HUD 要素
 const el = (id) => document.getElementById(id);
-const goldEl = el('gold');
-const waveEl = el('wave');
-const bestEl = el('best');
-const hpFill = el('hp-fill');
-const hpText = el('hp-text');
-const produceBtn = el('produce');
-const produceCost = el('produce-cost');
-const restartBtn = el('restart');
-const muteBtn = el('mute');
 
-// ── 解像度対応(Retina 対策に devicePixelRatio でスケール)──
+// ── 解像度対応 ──
 function resize() {
   const rect = canvas.getBoundingClientRect();
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -34,57 +24,82 @@ function resize() {
 }
 window.addEventListener('resize', resize);
 
-// ── ポインタ座標をキャンバスのローカル座標へ変換 ──
-function pos(e) {
-  const r = canvas.getBoundingClientRect();
-  return { x: e.clientX - r.left, y: e.clientY - r.top };
-}
-
-// 入力は Pointer Events に統一(マウス/タッチ両対応)。
-// ※ touchend で preventDefault すると iOS では他要素の click(スタート画面・
-//   各ボタン)まで打ち消されてしまうため、グローバルな preventDefault はしない。
-//   キャンバスの touch-action: none(CSS)でスクロール等は抑止済み。
+// ── 操作: ドラッグで部隊を左右に動かす(Pointer Events で統一)──
+function posX(e) { return e.clientX - canvas.getBoundingClientRect().left; }
+let steering = false;
 canvas.addEventListener('pointerdown', (e) => {
   unlock();
-  canvas.setPointerCapture?.(e.pointerId);   // 指がキャンバス外へ出ても追従
-  const p = pos(e); game.pointerDown(p.x, p.y);
+  canvas.setPointerCapture?.(e.pointerId);
+  steering = true;
+  game.steer(posX(e));
 });
-canvas.addEventListener('pointermove', (e) => {
-  if (!game.drag) return;
-  const p = pos(e); game.pointerMove(p.x, p.y);
-});
-canvas.addEventListener('pointerup', (e) => {
-  const p = pos(e); game.pointerUp(p.x, p.y);
-});
-canvas.addEventListener('pointercancel', () => { game.drag = null; });
+canvas.addEventListener('pointermove', (e) => { if (steering) game.steer(posX(e)); });
+canvas.addEventListener('pointerup', () => { steering = false; });
+canvas.addEventListener('pointercancel', () => { steering = false; });
 
-// ── ボタン ──
-produceBtn.addEventListener('click', () => { unlock(); game.produce(); });
-restartBtn.addEventListener('click', () => { game.reset(); });
-muteBtn.addEventListener('click', () => { unlock(); muteBtn.textContent = toggleMute() ? '🔇' : '🔊'; });
-
-// 連打しやすいよう、生産は長押し中も一定間隔で発火
-let holdTimer = null;
-produceBtn.addEventListener('pointerdown', () => {
-  holdTimer = setInterval(() => game.produce(), 220);
+// ── ミュート ──
+el('mute').addEventListener('click', (e) => {
+  e.stopPropagation();
+  unlock();
+  el('mute').textContent = toggleMute() ? '🔇' : '🔊';
 });
-const stopHold = () => { if (holdTimer) { clearInterval(holdTimer); holdTimer = null; } };
-produceBtn.addEventListener('pointerup', stopHold);
-produceBtn.addEventListener('pointerleave', stopHold);
+
+// ── スタートゲート ──
+el('start-gate').addEventListener('click', () => {
+  unlock();
+  el('start-gate').classList.add('hidden');
+});
+
+// ── 強化ショップ(ゲームオーバー画面)──
+const shop = el('shop');
+function buildShop() {
+  shop.innerHTML = '';
+  for (const up of C.UPGRADES) {
+    const lv = game.persist.upgrades[up.key] || 0;
+    const maxed = up.key === 'weapon' && lv >= C.MAX_WEAPON;
+    const cost = C.upgradeCost(lv);
+    const btn = document.createElement('button');
+    btn.className = 'shop-item';
+    btn.innerHTML =
+      `<span class="si-ic">${up.icon}</span>` +
+      `<span class="si-main"><b>${up.name}</b><small>Lv.${lv} ・ ${up.desc}</small></span>` +
+      `<span class="si-cost">${maxed ? 'MAX' : '🪙' + cost}</span>`;
+    const afford = !maxed && game.persist.coins >= cost;
+    btn.classList.toggle('locked', !afford);
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (game.buyUpgrade(up.key)) { buildShop(); refreshResult(); }
+    });
+    shop.appendChild(btn);
+  }
+}
+function refreshResult() {
+  el('ov-coins').textContent = game.persist.coins;
+}
+
+let wasOver = false;
+function showOverlay() {
+  el('ov-dist').textContent = game.distanceM;
+  el('ov-best').textContent = game.persist.bestDistance;
+  el('ov-coins').textContent = game.persist.coins;
+  el('ov-earned').textContent = game.coinsRun;
+  buildShop();
+  el('overlay').classList.remove('hidden');
+}
+
+el('restart').addEventListener('click', (e) => {
+  e.stopPropagation();
+  el('overlay').classList.add('hidden');
+  game.reset();
+});
 
 // ── HUD 更新 ──
 function updateHud() {
-  goldEl.textContent = game.gold;
-  waveEl.textContent = game.wave || 1;
-  bestEl.textContent = game.bestWave;
-  const ratio = Math.max(0, game.baseHP / game.baseMaxHP);
-  hpFill.style.width = (ratio * 100) + '%';
-  hpFill.style.background = ratio > 0.5 ? '#22c55e' : ratio > 0.25 ? '#f59e0b' : '#ef4444';
-  hpText.textContent = `${game.baseHP}/${game.baseMaxHP}`;
-  produceCost.textContent = game.produceCost;
-  const afford = game.gold >= game.produceCost && game.state === 'play';
-  produceBtn.classList.toggle('disabled', !afford);
-  restartBtn.style.display = game.state === 'over' ? 'block' : 'none';
+  el('dist').textContent = game.distanceM;
+  el('coins').textContent = game.persist.coins + game.coinsRun;
+  const w = C.weaponAt(game.weaponLevel);
+  el('wpn-ic').textContent = w.icon;
+  el('wpn-name').textContent = w.name;
 }
 
 // ── メインループ ──
@@ -95,15 +110,16 @@ function loop(now) {
   game.update(dt);
   render(ctx, game);
   updateHud();
+
+  if (game.state === 'over' && !wasOver) { wasOver = true; showOverlay(); }
+  if (game.state === 'play' && wasOver) wasOver = false;
+
+  // 操作ヒントは最初だけ
+  if (game.distance > 120) el('hint').classList.add('hidden');
+
   requestAnimationFrame(loop);
 }
 
-// ── スタートゲート(最初の 1 タップで音を有効化)──
-el('start-gate').addEventListener('click', () => {
-  unlock();
-  el('start-gate').classList.add('hidden');
-});
-
 resize();
-muteBtn.textContent = isMuted() ? '🔇' : '🔊';
+el('mute').textContent = isMuted() ? '🔇' : '🔊';
 requestAnimationFrame(loop);
